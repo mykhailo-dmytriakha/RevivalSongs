@@ -33,17 +33,27 @@ public class SongBook {
     @DBRef
     private List<Song> songs;
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTitle() {
         return title;
     }
 
-    // constructors, getters and setters, other methods
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public List<Song> getSongs() {
+        return songs;
+    }
+
+    public void setSongs(List<Song> songs) {
+        this.songs = songs;
+    }
 }

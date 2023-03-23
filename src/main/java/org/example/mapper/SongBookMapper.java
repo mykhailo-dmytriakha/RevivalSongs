@@ -2,23 +2,32 @@ package org.example.mapper;
 
 import org.example.model.SongBook;
 import org.example.model.dto.SongBookDto;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
-@Mapper(componentModel = "spring", uses = {SongMapper.class})
-public interface SongBookMapper {
+public class SongBookMapper {
+    @Autowired
+    private SongMapper songMapper;
 
-    @Mapping(target = "id", ignore = true)
-    SongBook toEntity(SongBookDto songBookDto);
+    public SongBook toEntity(SongBookDto songBookDto) {
+        return new SongBook(
+                songBookDto.getSongBookId(),
+                songBookDto.getTitle(),
+                songMapper.toEntity(songBookDto.getSongs())
+        );
+    }
 
-    @Mapping(target = "id", source = "id")
-    SongBookDto toDto(SongBook songBook);
+    public SongBookDto toDto(SongBook songBook) {
+        return new SongBookDto(songBook.getId(), songBook.getTitle(), songMapper.toDto(songBook.getSongs()));
+    }
 
-    List<SongBookDto> toDto(List<SongBook> songBooks);
+    public List<SongBookDto> toDto(List<SongBook> songBooks) {
+        return songBooks.stream().map(this::toDto).collect(Collectors.toList());
+    }
 
 }
 

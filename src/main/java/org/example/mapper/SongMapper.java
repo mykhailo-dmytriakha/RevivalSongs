@@ -2,18 +2,28 @@ package org.example.mapper;
 
 import org.example.model.Song;
 import org.example.model.dto.SongDto;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
-@Mapper(componentModel = "spring")
-public interface SongMapper {
+public class SongMapper {
 
-    @Mapping(target = "id", ignore = true)
-    Song toEntity(SongDto dto);
+    public Song toEntity(SongDto songDto) {
+        return new Song(songDto.getSongId(), songDto.getTitle(), songDto.getLyrics());
+    }
 
-    @Mapping(target = "songId", source = "id")
-    SongDto toDto(Song song);
+    public SongDto toDto(Song song) {
+        return new SongDto(song.getId(), song.getTitle(), song.getLyrics());
+    }
+
+    public List<Song> toEntity(List<SongDto> songs) {
+        return songs.stream().map(this::toEntity).collect(Collectors.toList());
+    }
+
+    public List<SongDto> toDto(List<Song> songs) {
+        return songs.stream().map(this::toDto).collect(Collectors.toList());
+    }
 }
 
