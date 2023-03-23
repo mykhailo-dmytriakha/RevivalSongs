@@ -15,7 +15,7 @@ public interface SongBookMapper {
     @Mapping(target = "id", ignore = true)
     SongBook toEntity(SongBookDto songBookDto);
 
-    @Mapping(target = "id", source = "_id")
+    @Mapping(target = "id", source = "id")
     SongBookDto toDto(SongBook songBook);
 
     List<SongBookDto> toDto(List<SongBook> songBooks);

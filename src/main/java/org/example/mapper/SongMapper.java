@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 @Mapper(componentModel = "spring")
 public interface SongMapper {
 
-    @Mapping(target = "_id", ignore = true)
+    @Mapping(target = "id", ignore = true)
     Song toEntity(SongDto dto);
 
-    @Mapping(target = "songId", source = "_id")
+    @Mapping(target = "songId", source = "id")
     SongDto toDto(Song song);
 }
 
