@@ -6,56 +6,64 @@ import org.example.model.dto.SongBookDto;
 import org.example.repo.SongBookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/songbooks")
+@RequestMapping("/api/songbooks")
 public class SongBookController {
+
     private static final String NOT_FOUND_MESSAGE = "Song book not found";
 
-    @Autowired
-    private SongBookRepository songBookRepository;
+    private final SongBookRepository songBookRepository;
+    private final SongBookMapper songBookMapper;
 
     @Autowired
-    private SongBookMapper songBookMapper;
+    public SongBookController(SongBookRepository songBookRepository, SongBookMapper songBookMapper) {
+        this.songBookRepository = songBookRepository;
+        this.songBookMapper = songBookMapper;
+    }
 
     @GetMapping
-    public List<SongBookDto> getAllSongBooks() {
-        List<SongBook> songBooks = songBookRepository.findAll();
-        return songBookMapper.toDto(songBooks);
+    public ResponseEntity<List<SongBookDto>> getAllSongBooks() {
+        List<SongBookDto> songBookDtos = songBookRepository.findAll().stream()
+                .map(songBookMapper::toDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(songBookDtos);
     }
 
     @GetMapping("/{id}")
-    public SongBookDto getSongBookById(@PathVariable String id) {
+    public ResponseEntity<SongBookDto> getSongBookById(@PathVariable String id) {
         SongBook songBook = songBookRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, NOT_FOUND_MESSAGE));
-        return songBookMapper.toDto(songBook);
+        return ResponseEntity.ok(songBookMapper.toDto(songBook));
     }
 
     @PostMapping
-    public SongBookDto createSongBook(@RequestBody SongBookDto songBookDto) {
-        SongBook songBook = songBookMapper.toEntity(songBookDto);
-        songBook = songBookRepository.save(songBook);
-        return songBookMapper.toDto(songBook);
+    public ResponseEntity<SongBookDto> createSongBook(@Valid @RequestBody SongBookDto songBookDto) {
+        SongBook songBook = songBookRepository.save(songBookMapper.toEntity(songBookDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(songBookMapper.toDto(songBook));
     }
 
     @PutMapping("/{id}")
-    public SongBookDto updateSongBook(@RequestBody SongBookDto updatedSongBookDto, @PathVariable String id) {
-        songBookRepository.findById(id)
+    public ResponseEntity<SongBookDto> updateSongBook(@PathVariable String id, @Valid @RequestBody SongBookDto updatedSongBookDto) {
+        SongBook songBook = songBookRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, NOT_FOUND_MESSAGE));
-        SongBook updatedSongBook = songBookMapper.toEntity(updatedSongBookDto);
-        updatedSongBook.setId(id);
-        return songBookMapper.toDto(songBookRepository.save(updatedSongBook));
+        songBook.setTitle(updatedSongBookDto.getTitle());
+        songBook = songBookRepository.save(songBook);
+        return ResponseEntity.ok(songBookMapper.toDto(songBook));
     }
 
-
     @DeleteMapping("/{id}")
-    public void deleteSongBook(@PathVariable String id) {
+    public ResponseEntity<Void> deleteSongBook(@PathVariable String id) {
         SongBook songBook = songBookRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, NOT_FOUND_MESSAGE));
         songBookRepository.delete(songBook);
+        return ResponseEntity.noContent().build();
     }
 }

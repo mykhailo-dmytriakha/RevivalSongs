@@ -1,0 +1,118 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: SongBook API
+  description: API documentation for SongBook application
+basePath: /api
+tags:
+  - name: songbooks
+    description: Operations related to song books
+schemes:
+  - https
+paths:
+  /songbooks:
+    get:
+      tags:
+        - songbooks
+      summary: Get all song books
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Returns a list of song books
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/SongBookDto'
+    post:
+      tags:
+        - songbooks
+      summary: Create a new song book
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: songBookDto
+          description: The song book to create
+          schema:
+            $ref: '#/definitions/SongBookDto'
+      responses:
+        201:
+          description: Returns the created song book
+          schema:
+            $ref: '#/definitions/SongBookDto'
+  /songbooks/{id}:
+    get:
+      tags:
+        - songbooks
+      summary: Get a song book by ID
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the song book to retrieve
+          type: string
+      responses:
+        200:
+          description: Returns the requested song book
+          schema:
+            $ref: '#/definitions/SongBookDto'
+        404:
+          description: Song book not found
+    put:
+      tags:
+        - songbooks
+      summary: Update a song book
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the song book to update
+          type: string
+        - in: body
+          name: updatedSongBookDto
+          description: The updated song book
+          schema:
+            $ref: '#/definitions/SongBookDto'
+      responses:
+        200:
+          description: Returns the updated song book
+          schema:
+            $ref: '#/definitions/SongBookDto'
+        404:
+          description: Song book not found
+    delete:
+      tags:
+        - songbooks
+      summary: Delete a song book
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the song book to delete
+          type: string
+      responses:
+        204:
+          description: Song book deleted successfully
+        404:
+          description: Song book not found
+definitions:
+  SongBookDto:
+    type: object
+    properties:
+      id:
+        type: string
+        example: "1"
+      title:
+        type: string
+        example: "The Beatles Songbook"
