@@ -10,7 +10,7 @@
 <body>
 <div class="container">
     <h1 class="mt-4 mb-4">Edit SongBook</h1>
-    <form th:action="@{/songbooks/{id}/edit(id=${songbook.id})}" th:object="${songbook}" method="post">
+    <form th:action="@{/api/songbooks/{id}(id=${songbook.id})}" th:object="${songbook}" method="post">
         <input type="hidden" th:field="*{id}"/>
         <div class="form-group">
             <label for="title">Title:</label>

@@ -7,6 +7,7 @@ import org.example.repo.SongBookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -14,7 +15,7 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController
+@Controller
 @RequestMapping("/api/songbooks")
 public class SongBookController {
 
@@ -50,13 +51,13 @@ public class SongBookController {
         return ResponseEntity.status(HttpStatus.CREATED).body(songBookMapper.toDto(songBook));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<SongBookDto> updateSongBook(@PathVariable String id, @Valid @RequestBody SongBookDto updatedSongBookDto) {
+    @PostMapping("/{id}")
+    public String updateSongBook(@PathVariable String id, @RequestParam("title") String title) {
         SongBook songBook = songBookRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, NOT_FOUND_MESSAGE));
-        songBook.setTitle(updatedSongBookDto.getTitle());
-        songBook = songBookRepository.save(songBook);
-        return ResponseEntity.ok(songBookMapper.toDto(songBook));
+        songBook.setTitle(title);
+        songBookRepository.save(songBook);
+        return "redirect:/songbooks";
     }
 
     @DeleteMapping("/{id}")
