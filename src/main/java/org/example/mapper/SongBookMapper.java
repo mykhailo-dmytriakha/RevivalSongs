@@ -15,7 +15,7 @@ public class SongBookMapper {
 
     public SongBook toEntity(SongBookDto songBookDto) {
         return new SongBook(
-                songBookDto.getSongBookId(),
+                songBookDto.getId(),
                 songBookDto.getTitle(),
                 songMapper.toEntity(songBookDto.getSongs())
         );

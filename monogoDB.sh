@@ -1,5 +1,5 @@
 docker start mongodb
-docker stop mongodb
+#docker stop mongodb
 
 #CREATE container
 #docker run -it -d -p 27017:27017 \

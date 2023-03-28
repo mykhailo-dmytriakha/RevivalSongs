@@ -1,29 +1,33 @@
 package org.example.controller;
 
-import org.example.mapper.SongBookMapper;
 import org.example.model.SongBook;
 import org.example.repo.SongBookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 
-@RequestMapping("/page")
-@RestController
+@Controller
 public class PageController {
+    private static final String NOT_FOUND_MESSAGE = "Song book not found";
     @Autowired
     private SongBookRepository songBookRepository;
 
-    @Autowired
-    private SongBookMapper songBookMapper;
-
     @GetMapping("/songbooks")
-    public String getSongBookPage(Model model) {
-        List<SongBook> songBooks = songBookRepository.findAll();
-        model.addAttribute("songBooks", songBookMapper.toDto(songBooks));
+    public String songbooks() {
         return "songbooks";
+    }
+
+    @GetMapping("/songbooks/{id}/edit")
+    public String editSongbook(@PathVariable("id") String id, Model model) {
+        SongBook songBook = songBookRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, NOT_FOUND_MESSAGE));
+        model.addAttribute("songbook", songBook);
+
+        return "edit-songbook";
     }
 }

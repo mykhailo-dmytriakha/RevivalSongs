@@ -1,20 +1,80 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="">
 <head>
-    <meta charset="UTF-8">
-    <title>Song Books</title>
+    <title>SongBook Application</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function editSongbook(id) {
+            window.location.href = '/songbooks/' + id + '/edit';
+        }
+    </script>
 </head>
 <body>
-<h1>Song Books</h1>
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Title</th>
-    </tr>
-    <tr th:each="songBook : ${songBooks}">
-        <td th:text="${songBook.id}"></td>
-        <td th:text="${songBook.title}"></td>
-    </tr>
-</table>
+<div class="container">
+    <h1>SongBooks</h1>
+
+    <div id="songbooks"></div>
+
+    <form id="createSongBookForm">
+        <div class="form-group">
+            <label for="title">Title:</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Create SongBook</button>
+    </form>
+</div>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    function loadSongbooks() {
+        $.ajax({
+            url: "/api/songbooks",
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                let songbooksHtml = '<table class="table table-striped mt-4"><thead><tr><th>ID</th><th>Title</th></tr></thead><tbody>';
+                for (let songbook of data) {
+                    songbooksHtml += '<tr><td>' + songbook.id + '</td><td style="cursor: pointer;" onclick="editSongbook(\'' + songbook.id + '\')">' + songbook.title + '</td></tr>';
+                }
+                songbooksHtml += '</tbody></table>';
+                $('#songbooks').html(songbooksHtml);
+
+            },
+            error: function () {
+                alert('Error fetching songbooks.');
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        loadSongbooks();
+
+        $('#createSongBookForm').submit(function (event) {
+            event.preventDefault();
+
+            const title = $('#title').val();
+            const newSongBook = {
+                title: title
+            };
+
+            $.ajax({
+                url: "/api/songbooks",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(newSongBook),
+                success: function () {
+                    $('#title').val('');
+                    loadSongbooks();
+                },
+                error: function () {
+                    alert('Error creating songbook.');
+                }
+            });
+        });
+    });
+    /*]]>*/
+</script>
 </body>
 </html>
